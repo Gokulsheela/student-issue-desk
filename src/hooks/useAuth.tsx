@@ -8,10 +8,12 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const checkAdminRole = async (userId: string) => {
+      setCheckingRole(true);
       const { data } = await supabase
         .from('user_roles')
         .select('role')
@@ -19,6 +21,7 @@ export const useAuth = () => {
         .eq('role', 'admin')
         .single();
       
+      setCheckingRole(false);
       return !!data;
     };
 
@@ -31,11 +34,12 @@ export const useAuth = () => {
         if (session?.user) {
           const adminStatus = await checkAdminRole(session.user.id);
           setIsAdmin(adminStatus);
+          setLoading(false);
         } else {
           setIsAdmin(false);
+          setCheckingRole(false);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -115,7 +119,7 @@ export const useAuth = () => {
   return {
     user,
     session,
-    loading,
+    loading: loading || checkingRole,
     isAdmin,
     signUp,
     signIn,
