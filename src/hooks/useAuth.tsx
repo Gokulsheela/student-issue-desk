@@ -11,6 +11,17 @@ export const useAuth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const checkAdminRole = async (userId: string) => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
+      
+      return !!data;
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -18,17 +29,8 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if user is admin
-          setTimeout(async () => {
-            const { data } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .eq('role', 'admin')
-              .single();
-            
-            setIsAdmin(!!data);
-          }, 0);
+          const adminStatus = await checkAdminRole(session.user.id);
+          setIsAdmin(adminStatus);
         } else {
           setIsAdmin(false);
         }
@@ -38,9 +40,15 @@ export const useAuth = () => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        const adminStatus = await checkAdminRole(session.user.id);
+        setIsAdmin(adminStatus);
+      }
+      
       setLoading(false);
     });
 
