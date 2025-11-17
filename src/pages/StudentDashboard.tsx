@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, LogOut, MessageSquare } from 'lucide-react';
 import complaintsIcon from '@/assets/complaints-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
-import emergencyCallIcon from '@/assets/emergency-call-soft-ui.png';
+import emergencyCallIcon from '@/assets/emergency-call-floating-3d.png';
 interface Complaint {
   id: string;
   title: string;
