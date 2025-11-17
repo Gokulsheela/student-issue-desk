@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MessageSquare, Phone } from 'lucide-react';
+import { Plus, LogOut, MessageSquare } from 'lucide-react';
 import complaintsIcon from '@/assets/complaints-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
+import emergencyCallIcon from '@/assets/emergency-call-icon.png';
 
 interface Complaint {
   id: string;
@@ -80,7 +81,7 @@ const StudentDashboard = () => {
               className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
               onClick={() => window.location.href = 'tel:emergency'}
             >
-              <Phone className="mr-2 h-4 w-4" />
+              <img src={emergencyCallIcon} alt="Emergency Call" className="mr-2 h-5 w-5" />
               Emergency
             </Button>
             <Button variant="outline" onClick={signOut}>
