@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MessageSquare } from 'lucide-react';
+import { Plus, LogOut, MessageSquare, Phone } from 'lucide-react';
 import complaintsIcon from '@/assets/complaints-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
 
@@ -75,10 +75,19 @@ const StudentDashboard = () => {
             <img src={complaintsIcon} alt="Complaints" className="w-10 h-10 rounded" />
             <h1 className="text-2xl font-bold text-foreground">My Complaints</h1>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
+              onClick={() => window.location.href = 'tel:emergency'}
+            >
+              <Phone className="mr-2 h-4 w-4" />
+              Emergency
+            </Button>
+            <Button variant="outline" onClick={signOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
