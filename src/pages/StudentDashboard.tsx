@@ -81,7 +81,13 @@ const StudentDashboard = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  
+                  <Button 
+                    size="icon" 
+                    onClick={() => window.location.href = 'tel:emergency'}
+                    className="bg-transparent hover:bg-transparent border-0"
+                  >
+                    <img src={emergencyCallIcon} alt="Emergency Call" className="w-10 h-10" />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Emergency Call</p>
