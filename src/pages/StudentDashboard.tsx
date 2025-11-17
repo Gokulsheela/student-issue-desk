@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, LogOut, MessageSquare } from 'lucide-react';
@@ -77,13 +78,22 @@ const StudentDashboard = () => {
             <h1 className="text-2xl font-bold text-foreground">My Complaints</h1>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold"
-              onClick={() => window.location.href = 'tel:emergency'}
-            >
-              <img src={emergencyCallIcon} alt="Emergency Call" className="mr-2 h-5 w-5" />
-              Emergency
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    size="icon"
+                    className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 h-10 w-10"
+                    onClick={() => window.location.href = 'tel:emergency'}
+                  >
+                    <img src={emergencyCallIcon} alt="Emergency Call" className="h-6 w-6" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Emergency Call</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button variant="outline" onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
