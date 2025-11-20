@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, LogOut, MessageSquare } from 'lucide-react';
 import complaintsIcon from '@/assets/complaints-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
-import emergencyCallIcon from '@/assets/emergency-call-floating-3d.png';
+import EmergencyCallButton from '@/components/EmergencyCallButton';
 interface Complaint {
   id: string;
   title: string;
@@ -78,21 +77,7 @@ const StudentDashboard = () => {
             <h1 className="text-2xl font-bold text-foreground">My Complaints</h1>
           </div>
           <div className="flex items-center gap-3">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    onClick={() => window.location.href = 'tel:emergency'}
-                    className="p-0 bg-transparent border-0 cursor-pointer hover:opacity-90 transition-opacity"
-                  >
-                    <img src={emergencyCallIcon} alt="Emergency Call" className="w-16 h-16" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Emergency Call</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <EmergencyCallButton />
             <Button variant="outline" onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out

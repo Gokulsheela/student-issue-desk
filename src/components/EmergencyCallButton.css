@@ -1,0 +1,106 @@
+:root {
+  --call-button-size: 64px;
+  --call-button-gradient-start: #e53935;
+  --call-button-gradient-end: #b71c1c;
+  --label-bg: rgba(0, 0, 0, 0.75);
+  --label-text: white;
+  --pulse-color: rgba(229, 57, 53, 0.4);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.emergency-call-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.call-button-circle {
+  width: var(--call-button-size);
+  height: var(--call-button-size);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--call-button-gradient-start), var(--call-button-gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3),
+              0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.emergency-call-button:hover .call-button-circle {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4),
+              0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.phone-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* Pulsing ring animation */
+.call-button-circle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--pulse-color);
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 140%;
+    height: 140%;
+    opacity: 0;
+  }
+}
+
+.call-button-label {
+  padding: 8px 16px;
+  background: var(--label-bg);
+  color: var(--label-text);
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease;
+}
+
+.emergency-call-button:hover .call-button-label {
+  transform: translateX(4px);
+}
+
+/* Hide label on very small screens */
+@media (max-width: 420px) {
+  .call-button-label {
+    display: none;
+  }
+}
