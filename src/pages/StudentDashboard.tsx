@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MessageSquare } from 'lucide-react';
+import { Plus, LogOut, MessageSquare, Trash2 } from 'lucide-react';
 import complaintsIcon from '@/assets/complaints-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
 import EmergencyCallButton from '@/components/EmergencyCallButton';
+import { useToast } from '@/hooks/use-toast';
 interface Complaint {
   id: string;
   title: string;
@@ -20,6 +21,7 @@ interface Complaint {
 }
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     user,
     signOut,
@@ -49,6 +51,31 @@ const StudentDashboard = () => {
     }
     setLoadingComplaints(false);
   };
+  const handleDelete = async (complaintId: string) => {
+    if (!confirm('Are you sure you want to delete this complaint?')) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from('complaints')
+      .delete()
+      .eq('id', complaintId);
+
+    if (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete complaint',
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Success',
+        description: 'Complaint deleted successfully',
+      });
+      fetchComplaints();
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
@@ -132,6 +159,9 @@ const StudentDashboard = () => {
                     <Button size="sm" onClick={() => navigate(`/chat/${complaint.id}`)}>
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Chat
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(complaint.id)}>
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
