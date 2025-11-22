@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/hero-image.jpg';
+import TypewriterSubtitle from '@/components/TypewriterSubtitle';
 const Landing = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen bg-background">
@@ -12,9 +13,7 @@ const Landing = () => {
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-foreground animate-fade-in">
                 BrotoFix
               </h1>
-              <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-                Submit issues easily and track responses in real time. Get the support you need, when you need it.
-              </p>
+              <TypewriterSubtitle />
               <div className="flex flex-col sm:flex-row gap-5 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
                 <Button 
                   size="lg" 
