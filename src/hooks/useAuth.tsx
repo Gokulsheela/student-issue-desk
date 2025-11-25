@@ -34,12 +34,11 @@ export const useAuth = () => {
         if (session?.user) {
           const adminStatus = await checkAdminRole(session.user.id);
           setIsAdmin(adminStatus);
-          setLoading(false);
         } else {
           setIsAdmin(false);
           setCheckingRole(false);
-          setLoading(false);
         }
+        setLoading(false);
       }
     );
 
@@ -51,6 +50,8 @@ export const useAuth = () => {
       if (session?.user) {
         const adminStatus = await checkAdminRole(session.user.id);
         setIsAdmin(adminStatus);
+      } else {
+        setCheckingRole(false);
       }
       
       setLoading(false);
@@ -105,22 +106,25 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    
-    // Clear local state regardless of API response
-    // If session is already expired, that's fine - we still want to sign out locally
+    // Clear local state first for immediate UI feedback
     setUser(null);
     setSession(null);
     setIsAdmin(false);
     
-    // Only show error for actual problems (not expired sessions)
-    if (error && error.message !== 'Session from session_id claim in JWT does not exist') {
+    // Then clear server-side session
+    const { error } = await supabase.auth.signOut();
+    
+    // Only show error for actual problems (not expired/missing sessions)
+    if (error && !error.message.includes('Session') && !error.message.includes('session')) {
       toast({
         title: 'Sign out failed',
         description: error.message,
         variant: 'destructive'
       });
     }
+    
+    // Navigate to auth page
+    window.location.href = '/auth';
   };
 
   return {
