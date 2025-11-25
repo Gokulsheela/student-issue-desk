@@ -1,10 +1,14 @@
 import './EmergencyCallButton.css';
 
-const EmergencyCallButton = () => {
+interface EmergencyCallButtonProps {
+  floating?: boolean;
+}
+
+const EmergencyCallButton = ({ floating = false }: EmergencyCallButtonProps) => {
   return (
     <a
       href="tel:+1234567890"
-      className="emergency-call-button"
+      className={`emergency-call-button ${floating ? 'floating' : ''}`}
       aria-label="Emergency Support - Call +1234567890"
     >
       <span className="visually-hidden">Emergency Support - Call +1234567890</span>
