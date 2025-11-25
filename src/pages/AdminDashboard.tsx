@@ -171,16 +171,17 @@ const AdminDashboard = () => {
               <AlertDialogTrigger asChild>
                 <Button 
                   variant="destructive" 
-                  size="sm"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto h-11 sm:h-9 px-4 sm:px-3"
                   disabled={complaints.filter(c => c.status === 'resolved').length === 0}
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Clear Resolved</span>
-                  <span className="sm:hidden">Clear</span>
-                  {complaints.filter(c => c.status === 'resolved').length > 0 && (
-                    <span className="ml-1">({complaints.filter(c => c.status === 'resolved').length})</span>
-                  )}
+                  <Trash2 className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span className="hidden sm:inline">
+                    Clear Resolved
+                    {complaints.filter(c => c.status === 'resolved').length > 0 && (
+                      <span className="ml-1">({complaints.filter(c => c.status === 'resolved').length})</span>
+                    )}
+                  </span>
+                  <span className="sm:hidden">Resolved Complaints</span>
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
