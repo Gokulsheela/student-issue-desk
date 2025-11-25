@@ -202,7 +202,7 @@ const AdminDashboard = () => {
             </AlertDialog>
           </div>
           
-          <div className="flex gap-4 mb-4">
+          <div className="flex gap-4 mb-8 sm:mb-4">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
