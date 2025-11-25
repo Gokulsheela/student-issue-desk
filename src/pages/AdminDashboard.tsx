@@ -243,12 +243,9 @@ const AdminDashboard = () => {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <CardTitle className="mb-2">{complaint.title}</CardTitle>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-foreground">
-                          Submitted by: {complaint.profiles?.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          ({complaint.profiles?.email})
+                      <div className="mb-2">
+                        <span className="text-sm text-muted-foreground">
+                          Submitted by: <span className="font-medium text-foreground">{complaint.profiles?.name}</span>
                         </span>
                       </div>
                       <CardDescription>
