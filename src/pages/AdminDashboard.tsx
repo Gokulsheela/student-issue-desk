@@ -171,12 +171,17 @@ const AdminDashboard = () => {
               <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle>{complaint.title}</CardTitle>
-                      <CardDescription className="mt-1">
-                        By {complaint.profiles?.name} ({complaint.profiles?.email})
-                      </CardDescription>
-                      <CardDescription className="mt-1">
+                    <div className="flex-1">
+                      <CardTitle className="mb-2">{complaint.title}</CardTitle>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-medium text-foreground">
+                          Submitted by: {complaint.profiles?.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          ({complaint.profiles?.email})
+                        </span>
+                      </div>
+                      <CardDescription>
                         {complaint.category} • {new Date(complaint.created_at).toLocaleDateString()}
                       </CardDescription>
                     </div>
