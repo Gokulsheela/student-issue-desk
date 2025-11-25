@@ -164,21 +164,30 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
             <h2 className="text-xl font-semibold text-foreground">All Complaints</h2>
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  disabled={complaints.filter(c => c.status === 'resolved').length === 0}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Clear Resolved Complaints
+                  <span className="hidden sm:inline">Clear Resolved</span>
+                  <span className="sm:hidden">Clear</span>
+                  {complaints.filter(c => c.status === 'resolved').length > 0 && (
+                    <span className="ml-1">({complaints.filter(c => c.status === 'resolved').length})</span>
+                  )}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Clear Resolved Complaints?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete all complaints marked as "resolved". 
+                    This will permanently delete {complaints.filter(c => c.status === 'resolved').length} complaint(s) marked as "resolved". 
                     This action cannot be undone. Active and unresolved complaints will not be affected.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
