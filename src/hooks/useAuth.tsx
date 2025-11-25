@@ -107,7 +107,14 @@ export const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     
-    if (error) {
+    // Clear local state regardless of API response
+    // If session is already expired, that's fine - we still want to sign out locally
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
+    
+    // Only show error for actual problems (not expired sessions)
+    if (error && error.message !== 'Session from session_id claim in JWT does not exist') {
       toast({
         title: 'Sign out failed',
         description: error.message,
