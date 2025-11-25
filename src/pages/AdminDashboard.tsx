@@ -254,8 +254,8 @@ const AdminDashboard = () => {
                     <div className="flex-1">
                       <CardTitle className="mb-2">{complaint.title}</CardTitle>
                       <div className="mb-2">
-                        <span className="text-sm text-muted-foreground">
-                          Submitted by: <span className="font-medium text-foreground">{complaint.profiles?.name}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {complaint.profiles?.name}
                         </span>
                       </div>
                       <CardDescription>
