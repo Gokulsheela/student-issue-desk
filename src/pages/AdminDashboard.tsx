@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, MessageSquare, Filter } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { LogOut, MessageSquare, Filter, Trash2 } from 'lucide-react';
 import adminIcon from '@/assets/admin-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
 
@@ -103,6 +105,42 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleClearResolvedComplaints = async () => {
+    const resolvedComplaintIds = complaints
+      .filter(c => c.status === 'resolved')
+      .map(c => c.id);
+
+    if (resolvedComplaintIds.length === 0) {
+      toast({
+        title: 'No resolved complaints',
+        description: 'There are no resolved complaints to clear.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('complaints')
+      .delete()
+      .in('id', resolvedComplaintIds);
+
+    if (error) {
+      toast({
+        title: 'Error clearing complaints',
+        description: error.message,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    toast({
+      title: 'Success',
+      description: `Cleared ${resolvedComplaintIds.length} resolved complaint(s).`
+    });
+
+    fetchComplaints();
+  };
+
   if (loading || loadingComplaints) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
       <p className="text-muted-foreground">Loading...</p>
@@ -126,7 +164,33 @@ const AdminDashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-foreground mb-4">All Complaints</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-foreground">All Complaints</h2>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear Resolved Complaints
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear Resolved Complaints?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all complaints marked as "resolved". 
+                    This action cannot be undone. Active and unresolved complaints will not be affected.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearResolvedComplaints}>
+                    Clear Resolved
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
           
           <div className="flex gap-4 mb-4">
             <div className="flex items-center gap-2">
