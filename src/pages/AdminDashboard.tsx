@@ -49,17 +49,32 @@ const AdminDashboard = () => {
   const fetchComplaints = async () => {
     const { data, error } = await supabase
       .from('complaints')
-      .select(`
-        *,
-        profiles:student_id (
-          name,
-          email
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setComplaints(data as any);
+    if (error) {
+      console.error('Error fetching complaints:', error);
+      setLoadingComplaints(false);
+      return;
+    }
+
+    if (data) {
+      // Fetch profiles separately for each complaint
+      const complaintsWithProfiles = await Promise.all(
+        data.map(async (complaint) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, email')
+            .eq('id', complaint.student_id)
+            .single();
+          
+          return {
+            ...complaint,
+            profiles: profile || { name: 'Unknown', email: 'N/A' }
+          };
+        })
+      );
+      setComplaints(complaintsWithProfiles as any);
     }
     setLoadingComplaints(false);
   };
