@@ -134,103 +134,111 @@ const ComplaintDetails = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-2xl">{complaint.title}</CardTitle>
-                  <CardDescription className="mt-2">
-                    Submitted by {complaint.profiles?.name} ({complaint.profiles?.email})
-                  </CardDescription>
-                  <CardDescription>
-                    Category: {complaint.category} • 
-                    Created: {new Date(complaint.created_at).toLocaleString()}
-                  </CardDescription>
-                </div>
-                <Badge className={getStatusColor(complaint.status)}>
-                  {complaint.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="font-semibold mb-2">Description</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">{complaint.description}</p>
-              </div>
-
-              {complaint.image_urls && complaint.image_urls.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3">Attached Images</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {complaint.image_urls.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Complaint image ${index + 1}`}
-                        className="rounded-lg w-full h-48 object-cover"
-                      />
-                    ))}
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Column - Complaint Details (65-70%) */}
+            <div className="flex-1 lg:w-[65%] space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-2xl">{complaint.title}</CardTitle>
+                      <CardDescription className="mt-2">
+                        Submitted by {complaint.profiles?.name} ({complaint.profiles?.email})
+                      </CardDescription>
+                      <CardDescription>
+                        Category: {complaint.category} • 
+                        Created: {new Date(complaint.created_at).toLocaleString()}
+                      </CardDescription>
+                    </div>
+                    <Badge className={getStatusColor(complaint.status)}>
+                      {complaint.status}
+                    </Badge>
                   </div>
-                </div>
-              )}
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2">Description</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{complaint.description}</p>
+                  </div>
 
-              {complaint.resolution_notes && (
-                <div>
-                  <h3 className="font-semibold mb-2">Resolution Notes</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap">{complaint.resolution_notes}</p>
-                </div>
-              )}
+                  {complaint.image_urls && complaint.image_urls.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3">Attached Images</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {complaint.image_urls.map((url, index) => (
+                          <img
+                            key={index}
+                            src={url}
+                            alt={`Complaint image ${index + 1}`}
+                            className="rounded-lg w-full h-48 object-cover"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              <Button 
-                onClick={() => navigate(`/chat/${complaint.id}`)}
-                className="w-full"
-              >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Open Chat
-              </Button>
-            </CardContent>
-          </Card>
+                  {complaint.resolution_notes && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Resolution Notes</h3>
+                      <p className="text-muted-foreground whitespace-pre-wrap">{complaint.resolution_notes}</p>
+                    </div>
+                  )}
 
-          {isAdmin && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Update Complaint</CardTitle>
-                <CardDescription>Change the status and add resolution notes</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="resolved">Resolved</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <Button 
+                    onClick={() => navigate(`/chat/${complaint.id}`)}
+                    className="w-full"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Open Chat
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Resolution Notes</Label>
-                  <Textarea
-                    id="notes"
-                    placeholder="Add notes about the resolution..."
-                    rows={4}
-                    value={resolutionNotes}
-                    onChange={(e) => setResolutionNotes(e.target.value)}
-                  />
-                </div>
+            {/* Right Column - Update Section (30-35%) */}
+            {isAdmin && (
+              <div className="lg:w-[35%]">
+                <Card className="sticky top-6">
+                  <CardHeader>
+                    <CardTitle>Update Complaint</CardTitle>
+                    <CardDescription>Change the status and add resolution notes</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Select value={status} onValueChange={setStatus}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <Button onClick={handleUpdate} disabled={updating} className="w-full">
-                  {updating ? 'Updating...' : 'Update Complaint'}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+                    <div className="space-y-2">
+                      <Label htmlFor="notes">Resolution Notes</Label>
+                      <Textarea
+                        id="notes"
+                        placeholder="Add notes about the resolution..."
+                        rows={6}
+                        value={resolutionNotes}
+                        onChange={(e) => setResolutionNotes(e.target.value)}
+                      />
+                    </div>
+
+                    <Button onClick={handleUpdate} disabled={updating} className="w-full">
+                      {updating ? 'Updating...' : 'Update Complaint'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
