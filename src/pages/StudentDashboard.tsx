@@ -18,6 +18,7 @@ interface Complaint {
   status: string;
   created_at: string;
   image_urls: string[];
+  resolution_notes: string | null;
 }
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -155,6 +156,14 @@ const StudentDashboard = () => {
                   <p className="text-muted-foreground mb-4 line-clamp-2">
                     {complaint.description}
                   </p>
+                  
+                  {complaint.resolution_notes && (
+                    <div className="mb-4 p-3 bg-muted/50 border-l-4 border-primary rounded-r">
+                      <p className="text-xs font-semibold text-primary mb-1">Admin Resolution</p>
+                      <p className="text-sm text-foreground">{complaint.resolution_notes}</p>
+                    </div>
+                  )}
+                  
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => navigate(`/complaint/${complaint.id}`)}>
                       View Details
