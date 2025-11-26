@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -246,50 +247,64 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {filteredComplaints.map((complaint) => (
-              <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <CardTitle className="mb-2">{complaint.title}</CardTitle>
-                      <div className="mb-2">
-                        <span className="text-sm font-medium text-foreground">
-                          {complaint.profiles?.name}
-                        </span>
-                      </div>
-                      <CardDescription>
-                        {complaint.category} • {new Date(complaint.created_at).toLocaleDateString()}
-                      </CardDescription>
-                    </div>
-                    <Badge className={getStatusColor(complaint.status)}>
-                      {complaint.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4 line-clamp-2">
-                    {complaint.description}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
+          <div className="bg-card rounded-lg border overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">ID</TableHead>
+                    <TableHead>Student Name</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead className="hidden md:table-cell">Category</TableHead>
+                    <TableHead className="hidden sm:table-cell">Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredComplaints.map((complaint) => (
+                    <TableRow 
+                      key={complaint.id}
+                      className="cursor-pointer hover:bg-muted/50"
                       onClick={() => navigate(`/complaint/${complaint.id}`)}
                     >
-                      View Details
-                    </Button>
-                    <Button 
-                      size="sm"
-                      onClick={() => navigate(`/chat/${complaint.id}`)}
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Chat
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <TableCell className="font-mono text-xs">
+                        {complaint.id.slice(0, 8)}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {complaint.profiles?.name}
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate">
+                        {complaint.title}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell capitalize">
+                        {complaint.category}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        {new Date(complaint.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(complaint.status)}>
+                          {complaint.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/chat/${complaint.id}`);
+                          }}
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </main>
