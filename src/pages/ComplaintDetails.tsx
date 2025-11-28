@@ -201,8 +201,8 @@ const ComplaintDetails = () => {
 
             {/* Right Column - Update Section (30-35%) */}
             {isAdmin && (
-              <div className="lg:w-[35%]">
-                <Card className="sticky top-4">
+              <div className="lg:w-[35%] flex items-center">
+                <Card className="w-full">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
                     <CardDescription className="text-xs">Change status and add notes</CardDescription>
