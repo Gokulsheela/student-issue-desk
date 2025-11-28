@@ -133,9 +133,9 @@ const ComplaintDetails = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-3">
             {/* Left Column - Complaint Details (65-70%) */}
             <div className="flex-1 lg:w-[65%]">
               <Card>
@@ -156,22 +156,24 @@ const ComplaintDetails = () => {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4 pt-0">
-                  <div>
+                <CardContent className="space-y-3 pt-0">
+                  <div className={!complaint.image_urls?.length ? "bg-muted/30 rounded-md p-4" : ""}>
                     <h3 className="font-semibold text-sm mb-1.5">Description</h3>
-                    <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{complaint.description}</p>
+                    <p className={`text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed ${!complaint.image_urls?.length ? "min-h-[200px]" : ""}`}>
+                      {complaint.description}
+                    </p>
                   </div>
 
                   {complaint.image_urls && complaint.image_urls.length > 0 && (
                     <div>
-                      <h3 className="font-semibold text-sm mb-2">Attached Images</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <h3 className="font-semibold text-sm mb-1.5">Attached Images</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {complaint.image_urls.map((url, index) => (
                           <img
                             key={index}
                             src={url}
                             alt={`Complaint image ${index + 1}`}
-                            className="rounded-md w-full h-40 object-cover border"
+                            className="rounded-md w-full h-36 object-cover border"
                           />
                         ))}
                       </div>
@@ -179,7 +181,7 @@ const ComplaintDetails = () => {
                   )}
 
                   {complaint.resolution_notes && (
-                    <div>
+                    <div className="bg-muted/30 rounded-md p-3">
                       <h3 className="font-semibold text-sm mb-1.5">Resolution Notes</h3>
                       <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{complaint.resolution_notes}</p>
                     </div>
@@ -187,7 +189,8 @@ const ComplaintDetails = () => {
 
                   <Button 
                     onClick={() => navigate(`/chat/${complaint.id}`)}
-                    className="w-full"
+                    className="w-full h-9"
+                    size="sm"
                   >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Open Chat
@@ -199,16 +202,16 @@ const ComplaintDetails = () => {
             {/* Right Column - Update Section (30-35%) */}
             {isAdmin && (
               <div className="lg:w-[35%]">
-                <Card className="sticky top-6">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Update Complaint</CardTitle>
+                <Card className="sticky top-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Update Complaint</CardTitle>
                     <CardDescription className="text-xs">Change status and add notes</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3 pt-0">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="status" className="text-sm">Status</Label>
+                  <CardContent className="space-y-2.5 pt-0">
+                    <div className="space-y-1">
+                      <Label htmlFor="status" className="text-xs">Status</Label>
                       <Select value={status} onValueChange={setStatus}>
-                        <SelectTrigger className="h-9">
+                        <SelectTrigger className="h-8 text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -219,19 +222,19 @@ const ComplaintDetails = () => {
                       </Select>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="notes" className="text-sm">Resolution Notes</Label>
+                    <div className="space-y-1">
+                      <Label htmlFor="notes" className="text-xs">Resolution Notes</Label>
                       <Textarea
                         id="notes"
                         placeholder="Add notes about the resolution..."
-                        rows={5}
+                        rows={4}
                         value={resolutionNotes}
                         onChange={(e) => setResolutionNotes(e.target.value)}
-                        className="text-sm resize-none"
+                        className="text-xs resize-none min-h-[80px]"
                       />
                     </div>
 
-                    <Button onClick={handleUpdate} disabled={updating} className="w-full">
+                    <Button onClick={handleUpdate} disabled={updating} className="w-full h-8" size="sm">
                       {updating ? 'Updating...' : 'Update Complaint'}
                     </Button>
                   </CardContent>
