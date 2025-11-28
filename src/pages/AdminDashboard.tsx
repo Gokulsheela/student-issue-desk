@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { LogOut, MessageSquare, Filter, Trash2 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import adminIcon from '@/assets/admin-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
 
@@ -256,7 +257,7 @@ const AdminDashboard = () => {
                     <TableHead>Student Name</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead className="hidden md:table-cell">Category</TableHead>
-                    <TableHead className="hidden sm:table-cell">Date</TableHead>
+                    <TableHead className="hidden sm:table-cell">Submitted</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -280,8 +281,8 @@ const AdminDashboard = () => {
                       <TableCell className="hidden md:table-cell capitalize">
                         {complaint.category}
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        {new Date(complaint.created_at).toLocaleDateString()}
+                      <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
+                        {formatDistanceToNow(new Date(complaint.created_at), { addSuffix: true })}
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(complaint.status)}>
