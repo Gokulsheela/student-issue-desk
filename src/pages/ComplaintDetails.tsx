@@ -133,13 +133,13 @@ const ComplaintDetails = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-4">
+      <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex flex-col lg:flex-row gap-3 mt-4">
             {/* Left Column - Complaint Details (65-70%) */}
             <div className="flex-1 lg:w-[65%]">
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-4 pt-6">
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1 min-w-0">
                       <CardTitle className="text-xl mb-1">{complaint.title}</CardTitle>
@@ -203,7 +203,7 @@ const ComplaintDetails = () => {
             {isAdmin && (
               <div className="lg:w-[35%] flex items-center">
                 <Card className="w-full">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
                     <CardDescription className="text-xs">Change status and add notes</CardDescription>
                   </CardHeader>
