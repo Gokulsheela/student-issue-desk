@@ -122,7 +122,7 @@ const ComplaintDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3">
           <Button 
             variant="ghost" 
             onClick={() => navigate(isAdmin ? '/admin-dashboard' : '/student-dashboard')}
@@ -133,20 +133,20 @@ const ComplaintDetails = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col lg:flex-row gap-4">
             {/* Left Column - Complaint Details (65-70%) */}
-            <div className="flex-1 lg:w-[65%] space-y-6">
+            <div className="flex-1 lg:w-[65%]">
               <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-2xl">{complaint.title}</CardTitle>
-                      <CardDescription className="mt-2">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-xl mb-1">{complaint.title}</CardTitle>
+                      <CardDescription className="text-sm">
                         Submitted by {complaint.profiles?.name} ({complaint.profiles?.email})
                       </CardDescription>
-                      <CardDescription>
+                      <CardDescription className="text-xs mt-0.5">
                         Category: {complaint.category} • 
                         Created: {new Date(complaint.created_at).toLocaleString()}
                       </CardDescription>
@@ -156,22 +156,22 @@ const ComplaintDetails = () => {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 pt-0">
                   <div>
-                    <h3 className="font-semibold mb-2">Description</h3>
-                    <p className="text-muted-foreground whitespace-pre-wrap">{complaint.description}</p>
+                    <h3 className="font-semibold text-sm mb-1.5">Description</h3>
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{complaint.description}</p>
                   </div>
 
                   {complaint.image_urls && complaint.image_urls.length > 0 && (
                     <div>
-                      <h3 className="font-semibold mb-3">Attached Images</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <h3 className="font-semibold text-sm mb-2">Attached Images</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {complaint.image_urls.map((url, index) => (
                           <img
                             key={index}
                             src={url}
                             alt={`Complaint image ${index + 1}`}
-                            className="rounded-lg w-full h-48 object-cover"
+                            className="rounded-md w-full h-40 object-cover border"
                           />
                         ))}
                       </div>
@@ -180,8 +180,8 @@ const ComplaintDetails = () => {
 
                   {complaint.resolution_notes && (
                     <div>
-                      <h3 className="font-semibold mb-2">Resolution Notes</h3>
-                      <p className="text-muted-foreground whitespace-pre-wrap">{complaint.resolution_notes}</p>
+                      <h3 className="font-semibold text-sm mb-1.5">Resolution Notes</h3>
+                      <p className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">{complaint.resolution_notes}</p>
                     </div>
                   )}
 
@@ -200,15 +200,15 @@ const ComplaintDetails = () => {
             {isAdmin && (
               <div className="lg:w-[35%]">
                 <Card className="sticky top-6">
-                  <CardHeader>
-                    <CardTitle>Update Complaint</CardTitle>
-                    <CardDescription>Change the status and add resolution notes</CardDescription>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Update Complaint</CardTitle>
+                    <CardDescription className="text-xs">Change status and add notes</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="status">Status</Label>
+                  <CardContent className="space-y-3 pt-0">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="status" className="text-sm">Status</Label>
                       <Select value={status} onValueChange={setStatus}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-9">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -219,14 +219,15 @@ const ComplaintDetails = () => {
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">Resolution Notes</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="notes" className="text-sm">Resolution Notes</Label>
                       <Textarea
                         id="notes"
                         placeholder="Add notes about the resolution..."
-                        rows={6}
+                        rows={5}
                         value={resolutionNotes}
                         onChange={(e) => setResolutionNotes(e.target.value)}
+                        className="text-sm resize-none"
                       />
                     </div>
 
