@@ -628,8 +628,7 @@ const ComplaintDetails = () => {
                 )}
 
                 {/* Update Complaint Section */}
-                {!complaint.is_duplicate && (
-                  <Card className="w-full">
+                <Card className="w-full">
                   <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
                     <CardDescription className="text-xs">Change status and add notes</CardDescription>
@@ -666,7 +665,6 @@ const ComplaintDetails = () => {
                     </Button>
                   </CardContent>
                 </Card>
-                )}
 
                 {/* Admin Notepad */}
                 <Card className="w-full">
