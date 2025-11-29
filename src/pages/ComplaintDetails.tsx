@@ -87,10 +87,19 @@ const ComplaintDetails = () => {
           .from('complaint_feedback')
           .select('rating, feedback_text, created_at')
           .eq('complaint_id', id)
-          .single();
+          .maybeSingle();
         
-        if (!feedbackError && feedbackData) {
+        // Set feedback if it exists, otherwise leave as null
+        if (feedbackData) {
+          console.log('Feedback found:', feedbackData);
           setFeedback(feedbackData);
+        } else {
+          console.log('No feedback found for complaint:', id);
+          setFeedback(null);
+        }
+        
+        if (feedbackError) {
+          console.error('Error fetching feedback:', feedbackError);
         }
       }
     }
