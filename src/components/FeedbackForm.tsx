@@ -48,6 +48,23 @@ export const FeedbackForm = ({ complaintId, onFeedbackSubmitted }: FeedbackFormP
       feedback_text: feedbackText.trim() || null
     };
 
+    // Check if feedback already exists (backend safeguard)
+    const { data: existingFeedback } = await supabase
+      .from('complaint_feedback')
+      .select('id')
+      .eq('complaint_id', complaintId)
+      .maybeSingle();
+
+    if (existingFeedback) {
+      toast({
+        title: 'Feedback already submitted',
+        description: 'You have already submitted feedback for this complaint.',
+        variant: 'destructive'
+      });
+      setSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase
       .from('complaint_feedback')
       .insert(feedbackData);
