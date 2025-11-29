@@ -2,8 +2,17 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/hero-image.jpg';
 import TypewriterSubtitle from '@/components/TypewriterSubtitle';
+import { ChevronDown } from 'lucide-react';
 const Landing = () => {
   const navigate = useNavigate();
+  
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features-section');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
   return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-24 lg:py-32">
@@ -41,10 +50,21 @@ const Landing = () => {
             </div>
           </div>
         </div>
+        
+        {/* Scroll Down Arrow */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <button
+            onClick={scrollToFeatures}
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 hover:bg-primary/20 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            aria-label="Scroll to features"
+          >
+            <ChevronDown className="w-6 h-6 text-primary" />
+          </button>
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 lg:py-32 bg-muted/30">
+      <section id="features-section" className="py-24 lg:py-32 bg-muted/30">
         <div className="container mx-auto px-6 lg:px-8">
           <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16 text-foreground">
             Key Features
