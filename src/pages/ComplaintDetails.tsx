@@ -33,6 +33,18 @@ interface Feedback {
   created_at: string;
 }
 
+interface SimilarComplaint {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  created_at: string;
+  student_name: string;
+  similarity_score: number;
+  similarity_reason: string;
+}
+
 const ComplaintDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -46,12 +58,17 @@ const ComplaintDetails = () => {
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [similarComplaints, setSimilarComplaints] = useState<SimilarComplaint[]>([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
 
   useEffect(() => {
     if (id && user) {
       fetchComplaint();
+      if (isAdmin) {
+        fetchSimilarComplaints();
+      }
     }
-  }, [id, user]);
+  }, [id, user, isAdmin]);
 
   const fetchComplaint = async () => {
     // Reset feedback state at the start
@@ -104,6 +121,31 @@ const ComplaintDetails = () => {
       }
     }
     setLoading(false);
+  };
+
+  const fetchSimilarComplaints = async () => {
+    setLoadingSimilar(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('find-similar-complaints', {
+        body: { complaintId: id }
+      });
+
+      if (error) {
+        console.error('Error fetching similar complaints:', error);
+        toast({
+          title: 'Failed to analyze similar complaints',
+          description: error.message,
+          variant: 'destructive'
+        });
+      } else if (data?.similar_complaints) {
+        console.log('Similar complaints found:', data.similar_complaints);
+        setSimilarComplaints(data.similar_complaints);
+      }
+    } catch (error) {
+      console.error('Error in fetchSimilarComplaints:', error);
+    } finally {
+      setLoadingSimilar(false);
+    }
   };
 
   const handleUpdate = async () => {
@@ -330,9 +372,84 @@ const ComplaintDetails = () => {
               )}
             </div>
 
-            {/* Right Column - Update Section (30-35%) */}
+            {/* Right Column - Update Section & AI Similar Complaints (30-35%) */}
             {isAdmin && (
               <div className="lg:w-[35%] space-y-3">
+                {/* AI Similar Complaints Section */}
+                <Card className="w-full border-primary/20">
+                  <CardHeader className="pb-3 pt-6">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <svg className="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                      AI Detected Similar Complaints
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Automatically detected using semantic analysis
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {loadingSimilar ? (
+                      <div className="text-center py-6">
+                        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-primary border-r-transparent"></div>
+                        <p className="text-xs text-muted-foreground mt-2">Analyzing complaints...</p>
+                      </div>
+                    ) : similarComplaints.length === 0 ? (
+                      <div className="text-center py-6">
+                        <p className="text-sm text-muted-foreground">No similar complaints detected</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {similarComplaints.map((similar) => (
+                          <Card 
+                            key={similar.id} 
+                            className="p-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                            onClick={() => navigate(`/complaint/${similar.id}`)}
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="text-sm font-semibold line-clamp-1">{similar.title}</h4>
+                                <Badge 
+                                  variant="secondary" 
+                                  className="text-xs shrink-0"
+                                >
+                                  {Math.round(similar.similarity_score * 100)}%
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-2">
+                                {similar.description}
+                              </p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {similar.category}
+                                </Badge>
+                                <span>•</span>
+                                <span>{similar.student_name}</span>
+                                <span>•</span>
+                                <Badge className={getStatusColor(similar.status) + " text-xs"}>
+                                  {similar.status}
+                                </Badge>
+                              </div>
+                              {similar.similarity_reason && (
+                                <p className="text-xs italic text-muted-foreground/80 pt-1">
+                                  "{similar.similarity_reason}"
+                                </p>
+                              )}
+                            </div>
+                          </Card>
+                        ))}
+                        {similarComplaints.length > 0 && (
+                          <div className="pt-2">
+                            <Badge variant="destructive" className="text-xs">
+                              ⚠️ {similarComplaints.length} Recurring Issue{similarComplaints.length > 1 ? 's' : ''} Detected
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
                 <Card className="w-full">
                   <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
