@@ -169,14 +169,16 @@ const StudentDashboard = () => {
                     </div>
                   )}
                   
-                  <div className="flex gap-2 pt-1">
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/complaint/${complaint.id}`)} className="h-8 text-xs px-3">
-                      View
-                    </Button>
-                    <Button size="sm" onClick={() => navigate(`/chat/${complaint.id}`)} className="h-8 text-xs px-3">
-                      <MessageSquare className="h-3.5 w-3.5 md:mr-1.5" />
-                      <span className="hidden md:inline">Chat</span>
-                    </Button>
+                  <div className="flex gap-2 pt-1 justify-between">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/complaint/${complaint.id}`)} className="h-8 text-xs px-3">
+                        View
+                      </Button>
+                      <Button size="sm" onClick={() => navigate(`/chat/${complaint.id}`)} className="h-8 text-xs px-3">
+                        <MessageSquare className="h-3.5 w-3.5 md:mr-1.5" />
+                        <span className="hidden md:inline">Chat</span>
+                      </Button>
+                    </div>
                     <Button variant="destructive" size="sm" onClick={() => handleDelete(complaint.id)} className="h-8 w-8 p-0">
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
