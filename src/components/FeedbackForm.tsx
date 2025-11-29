@@ -9,16 +9,12 @@ import { toast } from '@/hooks/use-toast';
 interface FeedbackFormProps {
   complaintId: string;
   onFeedbackSubmitted?: () => void;
-  existingFeedback?: {
-    rating: number;
-    feedback_text: string | null;
-  };
 }
 
-export const FeedbackForm = ({ complaintId, onFeedbackSubmitted, existingFeedback }: FeedbackFormProps) => {
-  const [rating, setRating] = useState(existingFeedback?.rating || 0);
+export const FeedbackForm = ({ complaintId, onFeedbackSubmitted }: FeedbackFormProps) => {
+  const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [feedbackText, setFeedbackText] = useState(existingFeedback?.feedback_text || '');
+  const [feedbackText, setFeedbackText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -52,14 +48,9 @@ export const FeedbackForm = ({ complaintId, onFeedbackSubmitted, existingFeedbac
       feedback_text: feedbackText.trim() || null
     };
 
-    const { error } = existingFeedback
-      ? await supabase
-          .from('complaint_feedback')
-          .update({ rating, feedback_text: feedbackText.trim() || null })
-          .eq('complaint_id', complaintId)
-      : await supabase
-          .from('complaint_feedback')
-          .insert(feedbackData);
+    const { error } = await supabase
+      .from('complaint_feedback')
+      .insert(feedbackData);
 
     if (error) {
       toast({
@@ -69,10 +60,8 @@ export const FeedbackForm = ({ complaintId, onFeedbackSubmitted, existingFeedbac
       });
     } else {
       toast({
-        title: existingFeedback ? 'Feedback updated' : 'Thank you for your feedback!',
-        description: existingFeedback 
-          ? 'Your feedback has been updated successfully.'
-          : 'Your feedback helps us improve our support services.'
+        title: 'Thank you for your feedback!',
+        description: 'Your feedback helps us improve our support services.'
       });
       onFeedbackSubmitted?.();
     }
@@ -85,12 +74,10 @@ export const FeedbackForm = ({ complaintId, onFeedbackSubmitted, existingFeedbac
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Star className="h-5 w-5 text-yellow-500" />
-          {existingFeedback ? 'Update Your Feedback' : 'How was your experience?'}
+          How was your experience?
         </CardTitle>
         <CardDescription>
-          {existingFeedback 
-            ? 'You can update your feedback within 7 days of submission.'
-            : 'Your feedback helps us improve our support services and better assist students in the future.'}
+          Your feedback helps us improve our support services and better assist students in the future.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -148,7 +135,7 @@ export const FeedbackForm = ({ complaintId, onFeedbackSubmitted, existingFeedbac
           disabled={submitting || rating === 0}
           className="w-full"
         >
-          {submitting ? 'Submitting...' : existingFeedback ? 'Update Feedback' : 'Submit Feedback'}
+          {submitting ? 'Submitting...' : 'Submit Feedback'}
         </Button>
       </CardContent>
     </Card>
