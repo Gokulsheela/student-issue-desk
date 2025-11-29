@@ -256,12 +256,12 @@ const ComplaintDetails = () => {
               {/* Feedback Display or Form for Students - Only show for resolved complaints */}
               {!isAdmin && complaint.status === 'resolved' && (
                 <div className="mt-3">
-                  {feedback ? (
+                  {feedback !== null ? (
                     <Card className="border-primary/20">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <MessageSquare className="h-5 w-5 text-primary" />
-                          Your Feedback
+                          Your Submitted Feedback
                         </CardTitle>
                         <CardDescription>
                           Submitted on {new Date(feedback.created_at).toLocaleDateString()}
