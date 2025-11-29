@@ -164,7 +164,7 @@ const StudentDashboard = () => {
                   
                   {complaint.resolution_notes && (
                     <div className="p-2.5 bg-muted/50 border-l-4 border-primary rounded-r">
-                      <p className="text-xs font-semibold text-primary mb-1">Admin Resolution</p>
+                      <p className="text-xs font-semibold text-primary mb-1">Admin Reply</p>
                       <p className="text-xs text-foreground leading-relaxed">{complaint.resolution_notes}</p>
                     </div>
                   )}
