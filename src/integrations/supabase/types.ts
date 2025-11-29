@@ -93,8 +93,10 @@ export type Database = {
           category: string
           created_at: string
           description: string
+          duplicate_of: string | null
           id: string
           image_urls: string[] | null
+          is_duplicate: boolean
           resolution_notes: string | null
           resolved_at: string | null
           status: string
@@ -107,8 +109,10 @@ export type Database = {
           category: string
           created_at?: string
           description: string
+          duplicate_of?: string | null
           id?: string
           image_urls?: string[] | null
+          is_duplicate?: boolean
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: string
@@ -121,8 +125,10 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          duplicate_of?: string | null
           id?: string
           image_urls?: string[] | null
+          is_duplicate?: boolean
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: string
@@ -130,7 +136,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "complaints_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

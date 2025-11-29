@@ -24,6 +24,8 @@ interface Complaint {
   updated_at: string;
   image_urls: string[];
   student_id: string;
+  is_duplicate: boolean;
+  duplicate_of: string | null;
   profiles: { name: string; email: string };
 }
 
@@ -60,12 +62,16 @@ const ComplaintDetails = () => {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [similarComplaints, setSimilarComplaints] = useState<SimilarComplaint[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [duplicateComplaints, setDuplicateComplaints] = useState<Complaint[]>([]);
+  const [originalComplaint, setOriginalComplaint] = useState<Complaint | null>(null);
+  const [markingDuplicate, setMarkingDuplicate] = useState(false);
 
   useEffect(() => {
     if (id && user) {
       fetchComplaint();
       if (isAdmin) {
         fetchSimilarComplaints();
+        fetchDuplicateComplaints();
       }
     }
   }, [id, user, isAdmin]);
@@ -98,8 +104,30 @@ const ComplaintDetails = () => {
       setResolutionNotes(data.resolution_notes || '');
       setAdminNotes(data.admin_notes || '');
       
-      // Fetch feedback if complaint is resolved and user is the student
-      if (data.status === 'resolved' && user?.id === data.student_id) {
+      // Fetch original complaint if this is a duplicate
+      if (data.is_duplicate && data.duplicate_of) {
+        const { data: original } = await supabase
+          .from('complaints')
+          .select('*')
+          .eq('id', data.duplicate_of)
+          .single();
+        
+        if (original) {
+          const { data: originalProfile } = await supabase
+            .from('profiles')
+            .select('name, email')
+            .eq('id', original.student_id)
+            .single();
+          
+          setOriginalComplaint({
+            ...original,
+            profiles: originalProfile || { name: 'Unknown', email: '' }
+          } as any);
+        }
+      }
+
+      // Fetch feedback if complaint is resolved and user is the student (and not a duplicate)
+      if (data.status === 'resolved' && user?.id === data.student_id && !data.is_duplicate) {
         const { data: feedbackData, error: feedbackError } = await supabase
           .from('complaint_feedback')
           .select('rating, feedback_text, created_at')
@@ -145,6 +173,35 @@ const ComplaintDetails = () => {
       console.error('Error in fetchSimilarComplaints:', error);
     } finally {
       setLoadingSimilar(false);
+    }
+  };
+
+  const fetchDuplicateComplaints = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('complaints')
+        .select('*')
+        .eq('duplicate_of', id);
+
+      if (!error && data) {
+        const duplicatesWithProfiles = await Promise.all(
+          data.map(async (complaint) => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('name, email')
+              .eq('id', complaint.student_id)
+              .single();
+            
+            return {
+              ...complaint,
+              profiles: profile || { name: 'Unknown', email: '' }
+            };
+          })
+        );
+        setDuplicateComplaints(duplicatesWithProfiles as any);
+      }
+    } catch (error) {
+      console.error('Error fetching duplicate complaints:', error);
     }
   };
 
@@ -203,6 +260,43 @@ const ComplaintDetails = () => {
     setSavingNotes(false);
   };
 
+  const handleMarkAsDuplicate = async (originalId: string) => {
+    setMarkingDuplicate(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('mark-duplicate', {
+        body: { 
+          duplicateComplaintId: id,
+          originalComplaintId: originalId
+        }
+      });
+
+      if (error) {
+        toast({
+          title: 'Failed to mark as duplicate',
+          description: error.message,
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Marked as duplicate',
+          description: 'This complaint has been marked as a duplicate'
+        });
+        fetchComplaint();
+        fetchDuplicateComplaints();
+      }
+    } catch (error) {
+      console.error('Error marking as duplicate:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark complaint as duplicate',
+        variant: 'destructive'
+      });
+    } finally {
+      setMarkingDuplicate(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500';
@@ -241,6 +335,32 @@ const ComplaintDetails = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
+          {/* Duplicate Banner */}
+          {complaint.is_duplicate && originalComplaint && (
+            <Card className="mb-4 border-orange-500/50 bg-orange-500/5">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                      <Badge variant="outline" className="bg-orange-500/10">Duplicate</Badge>
+                      This complaint is marked as a duplicate
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      This issue has been identified as a duplicate of another complaint.
+                    </p>
+                    <Button 
+                      onClick={() => navigate(`/complaint/${originalComplaint.id}`)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      View Original Complaint #{originalComplaint.id.slice(0, 8)}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="flex flex-col lg:flex-row gap-3 mt-4">
             {/* Left Column - Complaint Details (65-70%) */}
             <div className="flex-1 lg:w-[65%]">
@@ -304,8 +424,8 @@ const ComplaintDetails = () => {
                 </CardContent>
               </Card>
 
-              {/* Feedback Display or Form for Students - Only show for resolved complaints */}
-              {!isAdmin && complaint.status === 'resolved' && (
+              {/* Feedback Display or Form for Students - Only show for resolved complaints and not duplicates */}
+              {!isAdmin && complaint.status === 'resolved' && !complaint.is_duplicate && (
                 <div className="mt-3">
                   {feedback !== null ? (
                     <Card className="border-primary/20">
@@ -375,8 +495,51 @@ const ComplaintDetails = () => {
             {/* Right Column - Update Section & AI Similar Complaints (30-35%) */}
             {isAdmin && (
               <div className="lg:w-[35%] space-y-3">
+                {/* Linked Duplicate Complaints Section */}
+                {duplicateComplaints.length > 0 && (
+                  <Card className="w-full border-destructive/20">
+                    <CardHeader className="pb-3 pt-6">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Badge variant="destructive">Duplicates</Badge>
+                        Linked Duplicate Complaints
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        {duplicateComplaints.length} complaint{duplicateComplaints.length > 1 ? 's' : ''} marked as duplicate of this one
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {duplicateComplaints.map((duplicate) => (
+                          <Card 
+                            key={duplicate.id} 
+                            className="p-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                            onClick={() => navigate(`/complaint/${duplicate.id}`)}
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="text-sm font-semibold line-clamp-1">{duplicate.title}</h4>
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-2">
+                                {duplicate.description}
+                              </p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+                                <span>{duplicate.profiles?.name}</span>
+                                <span>•</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {duplicate.category}
+                                </Badge>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* AI Similar Complaints Section */}
-                <Card className="w-full border-primary/20">
+                {!complaint.is_duplicate && (
+                  <Card className="w-full border-primary/20">
                   <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base flex items-center gap-2">
                       <svg className="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,12 +566,16 @@ const ComplaintDetails = () => {
                         {similarComplaints.map((similar) => (
                           <Card 
                             key={similar.id} 
-                            className="p-3 hover:bg-muted/50 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/complaint/${similar.id}`)}
+                            className="p-3 hover:bg-muted/50 transition-colors"
                           >
                             <div className="space-y-1.5">
                               <div className="flex items-start justify-between gap-2">
-                                <h4 className="text-sm font-semibold line-clamp-1">{similar.title}</h4>
+                                <h4 
+                                  className="text-sm font-semibold line-clamp-1 cursor-pointer hover:underline"
+                                  onClick={() => navigate(`/complaint/${similar.id}`)}
+                                >
+                                  {similar.title}
+                                </h4>
                                 <Badge 
                                   variant="secondary" 
                                   className="text-xs shrink-0"
@@ -435,6 +602,15 @@ const ComplaintDetails = () => {
                                   "{similar.similarity_reason}"
                                 </p>
                               )}
+                              <Button 
+                                size="sm"
+                                variant="outline"
+                                className="w-full mt-2"
+                                onClick={() => handleMarkAsDuplicate(similar.id)}
+                                disabled={markingDuplicate}
+                              >
+                                {markingDuplicate ? 'Marking...' : 'Mark as Duplicate'}
+                              </Button>
                             </div>
                           </Card>
                         ))}
@@ -449,8 +625,11 @@ const ComplaintDetails = () => {
                     )}
                   </CardContent>
                 </Card>
+                )}
 
-                <Card className="w-full">
+                {/* Update Complaint Section */}
+                {!complaint.is_duplicate && (
+                  <Card className="w-full">
                   <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
                     <CardDescription className="text-xs">Change status and add notes</CardDescription>
@@ -487,6 +666,7 @@ const ComplaintDetails = () => {
                     </Button>
                   </CardContent>
                 </Card>
+                )}
 
                 {/* Admin Notepad */}
                 <Card className="w-full">

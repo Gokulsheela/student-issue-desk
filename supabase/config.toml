@@ -2,3 +2,6 @@ project_id = "vwmvwdkfsguthmocaxku"
 
 [functions.find-similar-complaints]
 verify_jwt = true
+
+[functions.mark-duplicate]
+verify_jwt = true

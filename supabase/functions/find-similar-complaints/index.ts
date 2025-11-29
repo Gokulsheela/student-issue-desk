@@ -42,11 +42,12 @@ serve(async (req) => {
       );
     }
 
-    // Fetch other complaints (excluding the target)
+    // Fetch other complaints (excluding the target and duplicates)
     const { data: otherComplaints, error: otherError } = await supabase
       .from('complaints')
-      .select('id, title, description, category, status, created_at, student_id')
+      .select('id, title, description, category, status, created_at, student_id, is_duplicate')
       .neq('id', complaintId)
+      .eq('is_duplicate', false)
       .order('created_at', { ascending: false })
       .limit(50); // Limit to recent 50 complaints for performance
 

@@ -22,6 +22,8 @@ interface Complaint {
   status: string;
   created_at: string;
   student_id: string;
+  is_duplicate: boolean;
+  duplicate_of: string | null;
   profiles: { name: string; email: string };
 }
 
@@ -291,9 +293,25 @@ const AdminDashboard = () => {
                         {formatDistanceToNow(new Date(complaint.created_at), { addSuffix: true })}
                       </TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(complaint.status)}>
-                          {complaint.status}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getStatusColor(complaint.status)}>
+                            {complaint.status}
+                          </Badge>
+                          {complaint.is_duplicate && (
+                            <Badge 
+                              variant="outline" 
+                              className="text-xs cursor-pointer hover:bg-muted"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (complaint.duplicate_of) {
+                                  navigate(`/complaint/${complaint.duplicate_of}`);
+                                }
+                              }}
+                            >
+                              Duplicate of #{complaint.duplicate_of?.slice(0, 8)}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button 
