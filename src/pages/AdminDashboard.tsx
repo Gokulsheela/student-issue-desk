@@ -152,46 +152,44 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <header className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={adminIcon} alt="Admin Dashboard" className="w-10 h-10 rounded" />
-            <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <img src={adminIcon} alt="Admin Dashboard" className="w-8 h-8 md:w-10 md:h-10 rounded flex-shrink-0" />
+            <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">Admin Dashboard</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate('/admin-analytics')}>
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Analytics
+          <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin-analytics')} className="h-8 md:h-9">
+              <BarChart3 className="h-3.5 w-3.5 md:mr-2 md:h-4 md:w-4" />
+              <span className="hidden md:inline">Analytics</span>
             </Button>
-            <Button variant="outline" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
+            <Button variant="outline" size="sm" onClick={signOut} className="h-8 md:h-9">
+              <LogOut className="h-3.5 w-3.5 md:mr-2 md:h-4 md:w-4" />
+              <span className="hidden md:inline">Sign Out</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex flex-row justify-between items-center gap-2 sm:gap-3 mb-4">
-            <h2 className="text-xl font-semibold text-foreground">All Complaints</h2>
+      <main className="container mx-auto px-4 py-4 md:py-8">
+        <div className="mb-4 md:mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-foreground">All Complaints</h2>
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button 
                   variant="destructive" 
-                  className="h-9 px-2 text-xs sm:text-sm sm:h-9 sm:px-3 whitespace-nowrap"
+                  size="sm"
+                  className="w-full sm:w-auto"
                   disabled={complaints.filter(c => c.status === 'resolved').length === 0}
                 >
-                  <Trash2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="hidden sm:inline">
-                    Clear Resolved
-                    {complaints.filter(c => c.status === 'resolved').length > 0 && (
-                      <span className="ml-1">({complaints.filter(c => c.status === 'resolved').length})</span>
-                    )}
-                  </span>
-                  <span className="sm:hidden">Resolved</span>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear Resolved
+                  {complaints.filter(c => c.status === 'resolved').length > 0 && (
+                    <span className="ml-1">({complaints.filter(c => c.status === 'resolved').length})</span>
+                  )}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -212,11 +210,11 @@ const AdminDashboard = () => {
             </AlertDialog>
           </div>
           
-          <div className="flex gap-4 mb-8 sm:mb-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -230,7 +228,7 @@ const AdminDashboard = () => {
             </div>
             
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px]">
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
@@ -256,81 +254,146 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="bg-card rounded-lg border overflow-hidden">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">ID</TableHead>
-                    <TableHead>Student Name</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead className="hidden md:table-cell">Category</TableHead>
-                    <TableHead className="hidden sm:table-cell">Submitted</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredComplaints.map((complaint) => (
-                    <TableRow 
-                      key={complaint.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/complaint/${complaint.id}`)}
-                    >
-                      <TableCell className="font-mono text-xs">
-                        {complaint.id.slice(0, 8)}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {complaint.profiles?.name}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {complaint.title}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell capitalize">
-                        {complaint.category}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
-                        {formatDistanceToNow(new Date(complaint.created_at), { addSuffix: true })}
-                      </TableCell>
-                      <TableCell>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredComplaints.map((complaint) => (
+                <Card 
+                  key={complaint.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow border-border"
+                  onClick={() => navigate(`/complaint/${complaint.id}`)}
+                >
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 min-w-0 space-y-1">
                         <div className="flex items-center gap-2">
-                          <Badge className={getStatusColor(complaint.status)}>
+                          <span className="font-mono text-xs text-muted-foreground">#{complaint.id.slice(0, 8)}</span>
+                          <Badge className={`${getStatusColor(complaint.status)} text-xs`}>
                             {complaint.status}
                           </Badge>
-                          {complaint.is_duplicate && (
-                            <Badge 
-                              variant="outline" 
-                              className="text-xs cursor-pointer hover:bg-muted"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (complaint.duplicate_of) {
-                                  navigate(`/complaint/${complaint.duplicate_of}`);
-                                }
-                              }}
-                            >
-                              Duplicate of #{complaint.duplicate_of?.slice(0, 8)}
-                            </Badge>
-                          )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button 
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/chat/${complaint.id}`);
-                          }}
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <p className="font-semibold text-sm leading-tight">{complaint.profiles?.name}</p>
+                      </div>
+                      <Button 
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/chat/${complaint.id}`);
+                        }}
+                        className="h-8 w-8 p-0 flex-shrink-0"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <p className="text-sm font-medium text-foreground line-clamp-2 leading-relaxed">
+                        {complaint.title}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="capitalize">{complaint.category}</span>
+                        <span>•</span>
+                        <span>{formatDistanceToNow(new Date(complaint.created_at), { addSuffix: true })}</span>
+                      </div>
+                    </div>
+
+                    {complaint.is_duplicate && (
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs cursor-pointer hover:bg-muted w-fit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (complaint.duplicate_of) {
+                            navigate(`/complaint/${complaint.duplicate_of}`);
+                          }
+                        }}
+                      >
+                        Duplicate of #{complaint.duplicate_of?.slice(0, 8)}
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-card rounded-lg border overflow-hidden">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px]">ID</TableHead>
+                      <TableHead>Student Name</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Submitted</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredComplaints.map((complaint) => (
+                      <TableRow 
+                        key={complaint.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/complaint/${complaint.id}`)}
+                      >
+                        <TableCell className="font-mono text-xs">
+                          {complaint.id.slice(0, 8)}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {complaint.profiles?.name}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {complaint.title}
+                        </TableCell>
+                        <TableCell className="capitalize">
+                          {complaint.category}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {formatDistanceToNow(new Date(complaint.created_at), { addSuffix: true })}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Badge className={getStatusColor(complaint.status)}>
+                              {complaint.status}
+                            </Badge>
+                            {complaint.is_duplicate && (
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs cursor-pointer hover:bg-muted"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (complaint.duplicate_of) {
+                                    navigate(`/complaint/${complaint.duplicate_of}`);
+                                  }
+                                }}
+                              >
+                                Duplicate of #{complaint.duplicate_of?.slice(0, 8)}
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button 
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/chat/${complaint.id}`);
+                            }}
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </>
         )}
       </main>
     </div>
