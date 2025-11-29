@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { FeedbackForm } from '@/components/FeedbackForm';
 
 interface Complaint {
   id: string;
@@ -26,6 +27,12 @@ interface Complaint {
   profiles: { name: string; email: string };
 }
 
+interface Feedback {
+  rating: number;
+  feedback_text: string | null;
+  created_at: string;
+}
+
 const ComplaintDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,6 +45,7 @@ const ComplaintDetails = () => {
   const [status, setStatus] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -69,6 +77,19 @@ const ComplaintDetails = () => {
       setStatus(data.status);
       setResolutionNotes(data.resolution_notes || '');
       setAdminNotes(data.admin_notes || '');
+      
+      // Fetch feedback if complaint is resolved and user is the student
+      if (data.status === 'resolved' && user?.id === data.student_id) {
+        const { data: feedbackData } = await supabase
+          .from('complaint_feedback')
+          .select('rating, feedback_text, created_at')
+          .eq('complaint_id', id)
+          .maybeSingle();
+        
+        if (feedbackData) {
+          setFeedback(feedbackData);
+        }
+      }
     }
     setLoading(false);
   };
@@ -228,6 +249,19 @@ const ComplaintDetails = () => {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Feedback Form for Students - Only show for resolved complaints */}
+              {!isAdmin && complaint.status === 'resolved' && (
+                <div className="mt-3">
+                  <FeedbackForm 
+                    complaintId={complaint.id}
+                    existingFeedback={feedback || undefined}
+                    onFeedbackSubmitted={() => {
+                      fetchComplaint();
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Right Column - Update Section (30-35%) */}

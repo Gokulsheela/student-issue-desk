@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Download, TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Clock, FileText } from 'lucide-react';
+import { ArrowLeft, Download, TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Clock, FileText, Star } from 'lucide-react';
 import { formatDistanceToNow, differenceInDays, subDays, format } from 'date-fns';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -41,6 +41,11 @@ interface Insight {
   message: string;
 }
 
+interface FeedbackData {
+  rating: number;
+  complaint_id: string;
+}
+
 const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
 
 const AdminAnalytics = () => {
@@ -59,6 +64,9 @@ const AdminAnalytics = () => {
   const [backlogStats, setBacklogStats] = useState<BacklogStats>({ over7Days: 0, over14Days: 0, over30Days: 0 });
   const [insights, setInsights] = useState<Insight[]>([]);
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [avgSatisfactionRating, setAvgSatisfactionRating] = useState(0);
+  const [feedbackCount, setFeedbackCount] = useState(0);
+  const [ratingDistribution, setRatingDistribution] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -112,13 +120,19 @@ const AdminAnalytics = () => {
       );
 
       setComplaints(complaintsWithProfiles as any);
-      calculateMetrics(complaintsWithProfiles, cutoffDate);
+      
+      // Fetch feedback data
+      const { data: feedbackData } = await supabase
+        .from('complaint_feedback')
+        .select('rating, complaint_id');
+      
+      calculateMetrics(complaintsWithProfiles, cutoffDate, feedbackData || []);
     }
     
     setLoadingData(false);
   };
 
-  const calculateMetrics = (data: Complaint[], cutoffDate: Date) => {
+  const calculateMetrics = (data: Complaint[], cutoffDate: Date, feedbackData: FeedbackData[]) => {
     // Filter by timeframe
     const filteredData = data.filter(c => new Date(c.created_at) >= cutoffDate);
     
@@ -197,11 +211,34 @@ const AdminAnalytics = () => {
     
     setTrendData(trendDataArray);
     
+    // Calculate feedback/satisfaction metrics
+    const filteredFeedback = feedbackData.filter(f => 
+      filteredData.some(c => c.id === f.complaint_id)
+    );
+    
+    if (filteredFeedback.length > 0) {
+      const totalRating = filteredFeedback.reduce((sum, f) => sum + f.rating, 0);
+      const avgRating = totalRating / filteredFeedback.length;
+      setAvgSatisfactionRating(Math.round(avgRating * 10) / 10);
+      setFeedbackCount(filteredFeedback.length);
+      
+      // Rating distribution
+      const ratingCounts = [1, 2, 3, 4, 5].map(rating => ({
+        rating: `${rating} Star${rating > 1 ? 's' : ''}`,
+        count: filteredFeedback.filter(f => f.rating === rating).length
+      }));
+      setRatingDistribution(ratingCounts);
+    } else {
+      setAvgSatisfactionRating(0);
+      setFeedbackCount(0);
+      setRatingDistribution([]);
+    }
+    
     // Generate insights
-    generateInsights(categoryStatsData, filteredData, data, over30);
+    generateInsights(categoryStatsData, filteredData, data, over30, filteredFeedback);
   };
 
-  const generateInsights = (categoryData: CategoryStats[], filteredData: Complaint[], allData: Complaint[], criticalBacklog: number) => {
+  const generateInsights = (categoryData: CategoryStats[], filteredData: Complaint[], allData: Complaint[], criticalBacklog: number, feedbackData: FeedbackData[]) => {
     const newInsights: Insight[] = [];
     
     // Most frequent category
@@ -264,6 +301,36 @@ const AdminAnalytics = () => {
           message: `Ticket volume decreased by ${Math.abs(Math.round(growth))}% this week. Great progress!`
         });
       }
+    }
+    
+    // Satisfaction insights
+    if (feedbackData.length > 0) {
+      const avgRating = feedbackData.reduce((sum, f) => sum + f.rating, 0) / feedbackData.length;
+      const responseRate = (feedbackData.length / resolvedTickets) * 100;
+      
+      if (avgRating >= 4.5) {
+        newInsights.push({
+          type: 'success',
+          message: `Excellent satisfaction rating of ${avgRating.toFixed(1)}/5.0! Keep up the great work.`
+        });
+      } else if (avgRating < 3.0) {
+        newInsights.push({
+          type: 'warning',
+          message: `Low satisfaction rating of ${avgRating.toFixed(1)}/5.0. Review support processes and feedback comments.`
+        });
+      }
+      
+      if (responseRate < 30) {
+        newInsights.push({
+          type: 'info',
+          message: `Only ${Math.round(responseRate)}% of resolved tickets have feedback. Encourage more students to share their experience.`
+        });
+      }
+    } else if (resolvedTickets > 5) {
+      newInsights.push({
+        type: 'info',
+        message: 'No feedback received yet. Encourage students to rate their support experience.'
+      });
     }
     
     setInsights(newInsights);
@@ -342,7 +409,7 @@ const AdminAnalytics = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -399,6 +466,23 @@ const AdminAnalytics = () => {
               <div className="text-3xl font-bold text-blue-600">{avgResolutionTime}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 days to resolve
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-500" />
+                Satisfaction
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600">
+                {avgSatisfactionRating > 0 ? avgSatisfactionRating.toFixed(1) : 'N/A'}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {feedbackCount > 0 ? `from ${feedbackCount} feedback${feedbackCount > 1 ? 's' : ''}` : 'no feedback yet'}
               </p>
             </CardContent>
           </Card>
@@ -515,6 +599,32 @@ const AdminAnalytics = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Satisfaction Rating Chart */}
+        {feedbackCount > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Satisfaction Ratings Distribution</CardTitle>
+              <CardDescription>Student feedback ratings breakdown</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={ratingDistribution}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="rating" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#f59e0b" name="Feedback Count" />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Total feedback received: {feedbackCount} • Average rating: {avgSatisfactionRating.toFixed(1)}/5.0
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Backlog Statistics */}
         <Card className="mb-8">
