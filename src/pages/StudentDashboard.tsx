@@ -140,7 +140,7 @@ const StudentDashboard = () => {
                 Submit Your First Complaint
               </Button>
             </CardContent>
-          </Card> : <div className="grid gap-3 md:gap-4">
+          </Card> : <div className="grid gap-5 md:gap-6">
             {complaints.map(complaint => <Card key={complaint.id} className="hover:shadow-md transition-shadow border-border shadow-sm">
                 <CardHeader className="pb-3 pt-4 px-4 space-y-1">
                   <div className="flex justify-between items-start gap-3">
