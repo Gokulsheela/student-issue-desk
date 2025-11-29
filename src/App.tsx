@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import SubmitComplaint from "./pages/SubmitComplaint";
 import ComplaintDetails from "./pages/ComplaintDetails";
 import Chat from "./pages/Chat";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-analytics" element={<AdminAnalytics />} />
           <Route path="/submit-complaint" element={<SubmitComplaint />} />
           <Route path="/complaint/:id" element={<ComplaintDetails />} />
           <Route path="/chat/:id" element={<Chat />} />

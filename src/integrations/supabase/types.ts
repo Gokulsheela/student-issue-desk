@@ -61,6 +61,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           resolution_notes: string | null
+          resolved_at: string | null
           status: string
           student_id: string
           title: string
@@ -74,6 +75,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           resolution_notes?: string | null
+          resolved_at?: string | null
           status?: string
           student_id: string
           title: string
@@ -87,6 +89,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           resolution_notes?: string | null
+          resolved_at?: string | null
           status?: string
           student_id?: string
           title?: string

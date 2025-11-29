@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { LogOut, MessageSquare, Filter, Trash2 } from 'lucide-react';
+import { LogOut, MessageSquare, Filter, Trash2, BarChart3 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import adminIcon from '@/assets/admin-icon.jpg';
 import emptyState from '@/assets/empty-state.jpg';
@@ -157,10 +157,16 @@ const AdminDashboard = () => {
             <img src={adminIcon} alt="Admin Dashboard" className="w-10 h-10 rounded" />
             <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate('/admin-analytics')}>
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Analytics
+            </Button>
+            <Button variant="outline" onClick={signOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
