@@ -96,19 +96,22 @@ const StudentDashboard = () => {
       <p className="text-muted-foreground">Loading...</p>
     </div>;
   }
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={complaintsIcon} alt="Complaints" className="w-10 h-10 rounded" />
-            <h1 className="text-2xl font-bold text-foreground">My Complaints</h1>
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <img src={complaintsIcon} alt="Complaints" className="w-8 h-8 rounded md:w-10 md:h-10" />
+            <h1 className="text-xl font-bold text-foreground md:text-2xl">My Complaints</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <EmergencyCallButton />
-            <Button variant="outline" onClick={signOut}>
+            <Button variant="outline" size="sm" onClick={signOut} className="hidden md:flex">
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
+            </Button>
+            <Button variant="outline" size="sm" onClick={signOut} className="md:hidden">
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -118,12 +121,12 @@ const StudentDashboard = () => {
       <EmergencyCallButton floating />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-foreground">Your Complaints</h2>
-          <Button onClick={() => navigate('/submit-complaint')}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Complaint
+      <main className="container mx-auto px-4 py-4 md:py-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-foreground md:text-xl">Your Complaints</h2>
+          <Button size="sm" onClick={() => navigate('/submit-complaint')}>
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">New Complaint</span>
           </Button>
         </div>
 
@@ -137,43 +140,45 @@ const StudentDashboard = () => {
                 Submit Your First Complaint
               </Button>
             </CardContent>
-          </Card> : <div className="grid gap-4">
-            {complaints.map(complaint => <Card key={complaint.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle>{complaint.title}</CardTitle>
-                      <CardDescription className="mt-1">
+          </Card> : <div className="grid gap-3 md:gap-4">
+            {complaints.map(complaint => <Card key={complaint.id} className="hover:shadow-md transition-shadow border-border shadow-sm">
+                <CardHeader className="pb-3 pt-4 px-4 space-y-1">
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base font-semibold leading-tight mb-1">
+                        {complaint.title}
+                      </CardTitle>
+                      <CardDescription className="text-xs text-muted-foreground">
                         {complaint.category} • {new Date(complaint.created_at).toLocaleDateString()}
                       </CardDescription>
                     </div>
-                    <Badge className={getStatusColor(complaint.status)}>
+                    <Badge className={`${getStatusColor(complaint.status)} text-xs px-2 py-0.5 shrink-0`}>
                       {complaint.status}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4 line-clamp-2">
+                <CardContent className="px-4 pb-4 pt-0 space-y-3">
+                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                     {complaint.description}
                   </p>
                   
                   {complaint.resolution_notes && (
-                    <div className="mb-4 p-3 bg-muted/50 border-l-4 border-primary rounded-r">
+                    <div className="p-2.5 bg-muted/50 border-l-4 border-primary rounded-r">
                       <p className="text-xs font-semibold text-primary mb-1">Admin Resolution</p>
-                      <p className="text-sm text-foreground">{complaint.resolution_notes}</p>
+                      <p className="text-xs text-foreground leading-relaxed">{complaint.resolution_notes}</p>
                     </div>
                   )}
                   
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/complaint/${complaint.id}`)}>
-                      View Details
+                  <div className="flex gap-2 pt-1">
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/complaint/${complaint.id}`)} className="h-8 text-xs px-3">
+                      View
                     </Button>
-                    <Button size="sm" onClick={() => navigate(`/chat/${complaint.id}`)}>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Chat
+                    <Button size="sm" onClick={() => navigate(`/chat/${complaint.id}`)} className="h-8 text-xs px-3">
+                      <MessageSquare className="h-3.5 w-3.5 md:mr-1.5" />
+                      <span className="hidden md:inline">Chat</span>
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(complaint.id)}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(complaint.id)} className="h-8 w-8 p-0">
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </CardContent>
