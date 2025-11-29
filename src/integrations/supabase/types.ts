@@ -54,6 +54,7 @@ export type Database = {
       }
       complaints: {
         Row: {
+          admin_notes: string | null
           category: string
           created_at: string
           description: string
@@ -66,6 +67,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           category: string
           created_at?: string
           description: string
@@ -78,6 +80,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           category?: string
           created_at?: string
           description?: string

@@ -18,6 +18,7 @@ interface Complaint {
   category: string;
   status: string;
   resolution_notes: string | null;
+  admin_notes: string | null;
   created_at: string;
   updated_at: string;
   image_urls: string[];
@@ -33,8 +34,10 @@ const ComplaintDetails = () => {
   const [complaint, setComplaint] = useState<Complaint | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
   const [status, setStatus] = useState('');
   const [resolutionNotes, setResolutionNotes] = useState('');
+  const [adminNotes, setAdminNotes] = useState('');
 
   useEffect(() => {
     if (id) {
@@ -65,6 +68,7 @@ const ComplaintDetails = () => {
       setComplaint(complaintWithProfile as any);
       setStatus(data.status);
       setResolutionNotes(data.resolution_notes || '');
+      setAdminNotes(data.admin_notes || '');
     }
     setLoading(false);
   };
@@ -95,6 +99,33 @@ const ComplaintDetails = () => {
     }
     
     setUpdating(false);
+  };
+
+  const handleSaveAdminNotes = async () => {
+    setSavingNotes(true);
+    
+    const { error } = await supabase
+      .from('complaints')
+      .update({
+        admin_notes: adminNotes
+      })
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: 'Save failed',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } else {
+      toast({
+        title: 'Notes saved',
+        description: 'Admin notes saved successfully'
+      });
+      fetchComplaint();
+    }
+    
+    setSavingNotes(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -201,7 +232,7 @@ const ComplaintDetails = () => {
 
             {/* Right Column - Update Section (30-35%) */}
             {isAdmin && (
-              <div className="lg:w-[35%] flex items-center">
+              <div className="lg:w-[35%] space-y-3">
                 <Card className="w-full">
                   <CardHeader className="pb-3 pt-6">
                     <CardTitle className="text-base">Update Complaint</CardTitle>
@@ -236,6 +267,26 @@ const ComplaintDetails = () => {
 
                     <Button onClick={handleUpdate} disabled={updating} className="w-full h-8" size="sm">
                       {updating ? 'Updating...' : 'Update Complaint'}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Admin Notepad */}
+                <Card className="w-full">
+                  <CardHeader className="pb-3 pt-4">
+                    <CardTitle className="text-base">Admin Notepad</CardTitle>
+                    <CardDescription className="text-xs">Private notes (not visible to students)</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2.5 pt-0">
+                    <Textarea
+                      placeholder="Add private admin notes here..."
+                      rows={6}
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      className="text-xs resize-none min-h-[120px]"
+                    />
+                    <Button onClick={handleSaveAdminNotes} disabled={savingNotes} className="w-full h-8" size="sm" variant="secondary">
+                      {savingNotes ? 'Saving...' : 'Save Notes'}
                     </Button>
                   </CardContent>
                 </Card>
