@@ -54,6 +54,9 @@ const ComplaintDetails = () => {
   }, [id]);
 
   const fetchComplaint = async () => {
+    // Reset feedback state at the start
+    setFeedback(null);
+    
     const { data, error } = await supabase
       .from('complaints')
       .select('*')
@@ -80,13 +83,13 @@ const ComplaintDetails = () => {
       
       // Fetch feedback if complaint is resolved and user is the student
       if (data.status === 'resolved' && user?.id === data.student_id) {
-        const { data: feedbackData } = await supabase
+        const { data: feedbackData, error: feedbackError } = await supabase
           .from('complaint_feedback')
           .select('rating, feedback_text, created_at')
           .eq('complaint_id', id)
-          .maybeSingle();
+          .single();
         
-        if (feedbackData) {
+        if (!feedbackError && feedbackData) {
           setFeedback(feedbackData);
         }
       }
