@@ -48,10 +48,10 @@ const ComplaintDetails = () => {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && user) {
       fetchComplaint();
     }
-  }, [id]);
+  }, [id, user]);
 
   const fetchComplaint = async () => {
     // Reset feedback state at the start
