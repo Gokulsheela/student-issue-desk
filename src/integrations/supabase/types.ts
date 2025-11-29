@@ -52,6 +52,41 @@ export type Database = {
           },
         ]
       }
+      complaint_feedback: {
+        Row: {
+          complaint_id: string
+          created_at: string
+          feedback_text: string | null
+          id: string
+          rating: number
+          student_id: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          rating: number
+          student_id: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          rating?: number
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_feedback_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: true
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       complaints: {
         Row: {
           admin_notes: string | null
